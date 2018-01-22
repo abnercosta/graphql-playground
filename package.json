@@ -1,8 +1,11 @@
 {
   "name": "tipe-playground",
   "version": "0.0.1",
-  "description": "A Vue.js project",
-  "author": "Travis Ueki <travis@Traviss-MacBook.local>",
+  "description": "An in-browser IDE built in Vue.js for exploring GraphQL by @TipeIO",
+  "contributors": [
+    "PatrickJS <patrick@tipe.io>",
+    "Travis Ueki <travis@Traviss-MacBook.local>"
+  ],
   "main": "dist/lib/tipe-playground.min.js",
   "private": false,
   "license": "MIT",
@@ -76,7 +79,7 @@
     "webpack-merge": "^4.1.0"
   },
   "engines": {
-    "node": ">= 4.0.0",
+    "node": ">= 8.0.0",
     "npm": ">= 3.0.0"
   },
   "browserslist": [
