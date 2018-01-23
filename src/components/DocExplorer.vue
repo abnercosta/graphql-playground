@@ -21,7 +21,37 @@
           :placeholder="`Search ${navItem.name}...`"
           :onSearch="handleSearch"
         />
-      {{ content }}
+        <div v-if="schema === undefined" class="spinner-container">
+          <div class="spinner" />
+        </div>
+        <div v-else-if="!schema" class="error-container">
+          {'No Schema Available'}
+        </div>
+        <SearchResults
+          v-else-if="navItem.search"
+          :searchValue="navItem.search"
+          :withinType="navItem.def"
+          :schema="schema"
+          @clickType="this.handleClickTypeOrField"
+          @clickField="this.handleClickTypeOrField"
+        />
+        <SchemaDoc
+          v-else-if="navStack.length === 1"
+          :schema="schema"
+          @clickType="handleClickTypeOrField"
+        />
+        <TypeDoc
+          v-else-if="isType(navItem.def)"
+          :schema="schema"
+          :type="navItem.def"
+          @clickType="handleClickTypeOrField"
+          @clickField="handleClickTypeOrField"
+        />
+        <FieldDoc
+          v-else
+          :field="navItem.def"
+          @clickType="handleClickTypeOrField"
+        />
     </div>
   </div>
 </template>
@@ -51,7 +81,22 @@ export default {
       navStack: [initialNav]
     }
   },
+  computed: {
+    navItem () {
+      return this.navStack[this.navStack.length - 1]
+    },
+    shouldSearchBoxAppear () {
+      return this.navStack.length === 1 || (isType(this.navItem.def) && this.navItem.def.getFields)
+    },
+    prevName () {
+      if (this.navStack.length > 1) {
+        return this.navStack[this.navStack.length - 2].name
+      }
+      return null
+    }
+  },
   methods: {
+    isType: isType,
     showDoc(typeOrField) {
       const navStack = this.navStack;
       const topNav = navStack[navStack.length - 1];
