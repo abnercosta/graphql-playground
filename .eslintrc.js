@@ -4,16 +4,23 @@ module.exports = {
   root: true,
   parser: 'babel-eslint',
   parserOptions: {
-    sourceType: 'module'
+    sourceType: 'module',
+    ecmaFeatures: {
+      "jsx": true
+    }
   },
   env: {
     browser: true,
   },
   // https://github.com/feross/standard/blob/master/RULES.md#javascript-standard-style
-  extends: 'standard',
+  extends: [
+    "eslint:recommended",
+    "plugin:react/recommended"
+  ],
   // required to lint *.vue files
   plugins: [
-    'html'
+    'html',
+    'react'
   ],
   // add your custom rules here
   rules: {
@@ -23,9 +30,20 @@ module.exports = {
     'generator-star-spacing': 0,
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
-    "promise/catch-or-return": "error",
+    "promise/catch-or-return": 1,
+    "promise/no-unknown-property": 1,
     "semi": 0,
-    "comma-dangle": 0
+    "comma-dangle": 0,
+    "react/jsx-uses-react": 1,
+    "react/react-in-jsx-scope": 1,
+    "react/jsx-uses-vars": 1,
+    "react/prop-types": 1,
+    "react/no-unknown-property": 1,
+    "react/no-find-dom-node": 1,
+    "no-undef": 1,
+    "no-unused-vars": 1,
+    "space-before-function-paren": 1,
+    "eol-last": 1
   },
   globals: {
     ENV: true,
@@ -42,6 +60,7 @@ module.exports = {
     "pit": true,
     "require": true,
     "xdescribe": true,
-    "xit": true
+    "xit": true,
+    "module": false,
   }
 }

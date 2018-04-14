@@ -1,4 +1,4 @@
-import Vue from "vue";
+import Vue from 'vue';
 import { buildClientSchema, GraphQLSchema, parse, print } from 'graphql';
 import { ExecuteButton } from './ExecuteButton';
 import { ToolbarButton } from './ToolbarButton';
@@ -28,14 +28,13 @@ const DEFAULT_DOC_EXPLORER_WIDTH = 350;
  */
 
 export const GraphiQL = {
-  data() {
+  data () {
     var props = this.$props;
 
     // Ensure props are correct
     if (typeof props.fetcher !== 'function') {
       throw new TypeError('GraphiQL requires a fetcher function.');
     } // Cache the storage instance
-
 
     this._storage = new StorageAPI(props.storage); // Determine the initial query to display.
 
@@ -73,19 +72,18 @@ export const GraphiQL = {
     return this.__state;
   },
 
-  mounted() {
+  mounted () {
     // Only fetch schema via introspection if a schema has not been
     // provided, including if `null` was provided.
     if (this.$data.schema === undefined) {
       this._fetchSchema();
     } // Utility for keeping CodeMirror correctly sized.
 
-
     this.codeMirrorSizer = new CodeMirrorSizer();
     global.g = this;
   },
 
-  beforeDestroy() {
+  beforeDestroy () {
     this._storage.set('query', this.$data.query);
 
     this._storage.set('variables', this.$data.variables);
@@ -103,14 +101,14 @@ export const GraphiQL = {
     this._storage.set('historyPaneOpen', this.$data.historyPaneOpen);
   },
 
-  render() {
+  render () {
     const children = React.Children.toArray(this.$children);
     const logo = find(children, child => child.type === GraphiQL.Logo) || <GraphiQL.Logo />;
     const toolbar = find(children, child => child.type === GraphiQL.Toolbar) || <GraphiQL.Toolbar>
-        <ToolbarButton onClick={this.handlePrettifyQuery} title="Prettify Query (Shift-Ctrl-P)" label="Prettify" />
-        <ToolbarButton onClick={this.handleToggleHistory} title="Show History" label="History" />
+      <ToolbarButton onClick={this.handlePrettifyQuery} title="Prettify Query (Shift-Ctrl-P)" label="Prettify" />
+      <ToolbarButton onClick={this.handleToggleHistory} title="Show History" label="History" />
 
-      </GraphiQL.Toolbar>;
+    </GraphiQL.Toolbar>;
     const footer = find(children, child => child.type === GraphiQL.Footer);
     const queryWrapStyle = {
       WebkitFlex: this.$data.editorFlex,
@@ -131,68 +129,68 @@ export const GraphiQL = {
       height: variableOpen ? this.$data.variableEditorHeight : null
     };
     return <div class="graphiql-container">
-        <div class="historyPaneWrap" style={historyPaneStyle}>
-          <QueryHistory operationName={this.$data.operationName} query={this.$data.query} variables={this.$data.variables} onSelectQuery={this.handleSelectHistoryQuery} storage={this._storage} queryID={this._editorQueryID}>
-            <div class="docExplorerHide" onClick={this.handleToggleHistory}>
-              {'\u2715'}
-            </div>
-          </QueryHistory>
-        </div>
-        <div class="editorWrap">
-          <div class="topBarWrap">
-            <div class="topBar">
-              {logo}
-              <ExecuteButton isRunning={Boolean(this.$data.subscription)} onRun={this.handleRunQuery} onStop={this.handleStopQuery} operations={this.$data.operations} />
-              {toolbar}
-            </div>
-            {!this.$data.docExplorerOpen && <button class="docExplorerShow" onClick={this.handleToggleDocs}>
-                {'Docs'}
-              </button>}
+      <div class="historyPaneWrap" style={historyPaneStyle}>
+        <QueryHistory operationName={this.$data.operationName} query={this.$data.query} variables={this.$data.variables} onSelectQuery={this.handleSelectHistoryQuery} storage={this._storage} queryID={this._editorQueryID}>
+          <div class="docExplorerHide" onClick={this.handleToggleHistory}>
+            {'\u2715'}
           </div>
-          <div ref={n => {
+        </QueryHistory>
+      </div>
+      <div class="editorWrap">
+        <div class="topBarWrap">
+          <div class="topBar">
+            {logo}
+            <ExecuteButton isRunning={Boolean(this.$data.subscription)} onRun={this.handleRunQuery} onStop={this.handleStopQuery} operations={this.$data.operations} />
+            {toolbar}
+          </div>
+          {!this.$data.docExplorerOpen && <button class="docExplorerShow" onClick={this.handleToggleDocs}>
+            {'Docs'}
+          </button>}
+        </div>
+        <div ref={n => {
           this.editorBarComponent = n;
         }} class="editorBar" onDoubleClick={this.handleResetResize} onMouseDown={this.handleResizeStart}>
-            <div class="queryWrap" style={queryWrapStyle}>
-              <QueryEditor ref={n => {
+          <div class="queryWrap" style={queryWrapStyle}>
+            <QueryEditor ref={n => {
               this.queryEditorComponent = n;
             }} schema={this.$data.schema} value={this.$data.query} onEdit={this.handleEditQuery} onHintInformationRender={this.handleHintInformationRender} onClickReference={this.handleClickReference} onPrettifyQuery={this.handlePrettifyQuery} onRunQuery={this.handleEditorRunQuery} editorTheme={this.$attrs.editorTheme} />
-              <div class="variable-editor" style={variableStyle}>
-                <div class="variable-editor-title" style={{
+            <div class="variable-editor" style={variableStyle}>
+              <div class="variable-editor-title" style={{
                 cursor: variableOpen ? 'row-resize' : 'n-resize'
               }} onMouseDown={this.handleVariableResizeStart}>
-                  {'Query Variables'}
-                </div>
-                <VariableEditor ref={n => {
+                {'Query Variables'}
+              </div>
+              <VariableEditor ref={n => {
                 this.variableEditorComponent = n;
               }} value={this.$data.variables} variableToType={this.$data.variableToType} onEdit={this.handleEditVariables} onHintInformationRender={this.handleHintInformationRender} onPrettifyQuery={this.handlePrettifyQuery} onRunQuery={this.handleEditorRunQuery} editorTheme={this.$attrs.editorTheme} />
-              </div>
-            </div>
-            <div class="resultWrap">
-              {this.$data.isWaitingForResponse && <div class="spinner-container">
-                  <div class="spinner" />
-                </div>}
-              <ResultViewer ref={c => {
-              this.resultComponent = c;
-            }} value={this.$data.response} editorTheme={this.$attrs.editorTheme} ResultsTooltip={this.$attrs.ResultsTooltip} />
-              {footer}
             </div>
           </div>
+          <div class="resultWrap">
+            {this.$data.isWaitingForResponse && <div class="spinner-container">
+              <div class="spinner" />
+            </div>}
+            <ResultViewer ref={c => {
+              this.resultComponent = c;
+            }} value={this.$data.response} editorTheme={this.$attrs.editorTheme} ResultsTooltip={this.$attrs.ResultsTooltip} />
+            {footer}
+          </div>
         </div>
-        <div class={docExplorerWrapClasses} style={docWrapStyle}>
-          <div class="docExplorerResizer" onDoubleClick={this.handleDocsResetResize} onMouseDown={this.handleDocsResizeStart} />
-          <DocExplorer ref={c => {
+      </div>
+      <div class={docExplorerWrapClasses} style={docWrapStyle}>
+        <div class="docExplorerResizer" onDoubleClick={this.handleDocsResetResize} onMouseDown={this.handleDocsResizeStart} />
+        <DocExplorer ref={c => {
           this.docExplorerComponent = c;
         }} schema={this.$data.schema}>
-            <div class="docExplorerHide" onClick={this.handleToggleDocs}>
-              {'\u2715'}
-            </div>
-          </DocExplorer>
-        </div>
-      </div>;
+          <div class="docExplorerHide" onClick={this.handleToggleDocs}>
+            {'\u2715'}
+          </div>
+        </DocExplorer>
+      </div>
+    </div>;
   },
 
   methods: {
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps (nextProps) {
       let nextSchema = this.$data.schema;
       let nextQuery = this.$data.query;
       let nextVariables = this.$data.variables;
@@ -229,7 +227,6 @@ export const GraphiQL = {
       } // If schema is not supplied via props and the fetcher changed, then
       // remove the schema so fetchSchema() will be called with the new fetcher.
 
-
       if (nextProps.schema === undefined && nextProps.fetcher !== this.$attrs.fetcher) {
         nextSchema = undefined;
       }
@@ -249,27 +246,27 @@ export const GraphiQL = {
       });
     },
 
-    componentDidUpdate() {
+    componentDidUpdate () {
       // If this update caused DOM nodes to have changed sizes, update the
       // corresponding CodeMirror instance sizes to match.
       this.codeMirrorSizer.updateSizes([this.queryEditorComponent, this.variableEditorComponent, this.resultComponent]);
     },
 
-    getQueryEditor() {
+    getQueryEditor () {
       return this.queryEditorComponent.getCodeMirror();
     },
 
-    getVariableEditor() {
+    getVariableEditor () {
       return this.variableEditorComponent.getCodeMirror();
     },
 
-    refresh() {
+    refresh () {
       this.queryEditorComponent.getCodeMirror().refresh();
       this.variableEditorComponent.getCodeMirror().refresh();
       this.resultComponent.getCodeMirror().refresh();
     },
 
-    autoCompleteLeafs() {
+    autoCompleteLeafs () {
       const {
         insertions,
         result
@@ -307,7 +304,7 @@ export const GraphiQL = {
       return result;
     },
 
-    _fetchSchema() {
+    _fetchSchema () {
       const fetcher = this.$attrs.fetcher;
       const fetch = observableToPromise(fetcher({
         query: introspectionQuery
@@ -323,7 +320,6 @@ export const GraphiQL = {
           return result;
         } // Try the stock introspection query first, falling back on the
         // sans-subscriptions query for services which do not yet support it.
-
 
         const fetch2 = observableToPromise(fetcher({
           query: introspectionQuerySansSubscriptions
@@ -355,7 +351,7 @@ export const GraphiQL = {
       });
     },
 
-    _fetchQuery(query, variables, operationName, cb) {
+    _fetchQuery (query, variables, operationName, cb) {
       const fetcher = this.$attrs.fetcher;
       let jsonVariables = null;
 
@@ -400,7 +396,7 @@ export const GraphiQL = {
       }
     },
 
-    handleClickReference(reference) {
+    handleClickReference (reference) {
       this.setState({
         docExplorerOpen: true
       }, () => {
@@ -408,7 +404,7 @@ export const GraphiQL = {
       });
     },
 
-    handleRunQuery(selectedOperationName) {
+    handleRunQuery (selectedOperationName) {
       this._editorQueryID++;
       const queryID = this._editorQueryID; // Use the edited query after autoCompleteLeafs() runs or,
       // in case autoCompletion fails (the function returns undefined),
@@ -439,7 +435,7 @@ export const GraphiQL = {
       }
     },
 
-    handleStopQuery() {
+    handleStopQuery () {
       const subscription = this.$data.subscription;
       this.isWaitingForResponse = false, this.subscription = null;
 
@@ -448,7 +444,7 @@ export const GraphiQL = {
       }
     },
 
-    _runQueryAtCursor() {
+    _runQueryAtCursor () {
       if (this.$data.subscription) {
         this.handleStopQuery();
         return;
@@ -478,12 +474,12 @@ export const GraphiQL = {
       this.handleRunQuery(operationName);
     },
 
-    handlePrettifyQuery() {
+    handlePrettifyQuery () {
       const editor = this.getQueryEditor();
       editor.setValue(print(parse(editor.getValue())));
     },
 
-    _updateQueryFacts(query, operationName, prevOperations, schema) {
+    _updateQueryFacts (query, operationName, prevOperations, schema) {
       const queryFacts = getQueryFacts(schema, query);
 
       if (queryFacts) {
@@ -503,15 +499,15 @@ export const GraphiQL = {
       }
     },
 
-    handleEditVariables(value) {
+    handleEditVariables (value) {
       this.variables = value;
 
       if (this.$attrs.onEditVariables) {
-        this.$emit("editVariables", value);
+        this.$emit('editVariables', value);
       }
     },
 
-    handleEditOperationName(operationName) {
+    handleEditOperationName (operationName) {
       const onEditOperationName = this.$attrs.onEditOperationName;
 
       if (onEditOperationName) {
@@ -519,7 +515,7 @@ export const GraphiQL = {
       }
     },
 
-    handleHintInformationRender(elem) {
+    handleHintInformationRender (elem) {
       elem.addEventListener('click', this._onClickHintInformation);
       let onRemoveFn;
       elem.addEventListener('DOMNodeRemoved', onRemoveFn = () => {
@@ -528,11 +524,11 @@ export const GraphiQL = {
       });
     },
 
-    handleEditorRunQuery() {
+    handleEditorRunQuery () {
       this._runQueryAtCursor();
     },
 
-    _onClickHintInformation(event) {
+    _onClickHintInformation (event) {
       if (event.target.className === 'typeName') {
         const typeName = event.target.innerHTML;
         const schema = this.$data.schema;
@@ -551,29 +547,29 @@ export const GraphiQL = {
       }
     },
 
-    handleToggleDocs() {
+    handleToggleDocs () {
       if (typeof this.$attrs.onToggleDocs === 'function') {
-        this.$emit("toggleDocs", !this.$data.docExplorerOpen);
+        this.$emit('toggleDocs', !this.$data.docExplorerOpen);
       }
 
       this.docExplorerOpen = !this.$data.docExplorerOpen;
     },
 
-    handleToggleHistory() {
+    handleToggleHistory () {
       if (typeof this.$attrs.onToggleHistory === 'function') {
-        this.$emit("toggleHistory", !this.$data.historyPaneOpen);
+        this.$emit('toggleHistory', !this.$data.historyPaneOpen);
       }
 
       this.historyPaneOpen = !this.$data.historyPaneOpen;
     },
 
-    handleSelectHistoryQuery(query, variables, operationName) {
+    handleSelectHistoryQuery (query, variables, operationName) {
       this.handleEditQuery(query);
       this.handleEditVariables(variables);
       this.handleEditOperationName(operationName);
     },
 
-    handleResizeStart(downEvent) {
+    handleResizeStart (downEvent) {
       if (!this._didClickDragBar(downEvent)) {
         return;
       }
@@ -603,11 +599,11 @@ export const GraphiQL = {
       document.addEventListener('mouseup', onMouseUp);
     },
 
-    handleResetResize() {
+    handleResetResize () {
       this.editorFlex = 1;
     },
 
-    _didClickDragBar(event) {
+    _didClickDragBar (event) {
       // Only for primary unmodified clicks
       if (event.button !== 0 || event.ctrlKey) {
         return false;
@@ -618,7 +614,6 @@ export const GraphiQL = {
       if (target.className.indexOf('CodeMirror-gutter') !== 0) {
         return false;
       } // Specifically the result window's drag bar.
-
 
       const resultWindow = ReactDOM.findDOMNode(this.resultComponent);
 
@@ -633,7 +628,7 @@ export const GraphiQL = {
       return false;
     },
 
-    handleDocsResizeStart(downEvent) {
+    handleDocsResizeStart (downEvent) {
       downEvent.preventDefault();
       const hadWidth = this.$data.docExplorerWidth;
       const offset = downEvent.clientX - getLeft(downEvent.target);
@@ -669,11 +664,11 @@ export const GraphiQL = {
       document.addEventListener('mouseup', onMouseUp);
     },
 
-    handleDocsResetResize() {
+    handleDocsResetResize () {
       this.docExplorerWidth = DEFAULT_DOC_EXPLORER_WIDTH;
     },
 
-    handleVariableResizeStart(downEvent) {
+    handleVariableResizeStart (downEvent) {
       downEvent.preventDefault();
       let didMove = false;
       const wasOpen = this.$data.variableEditorOpen;
@@ -715,19 +710,17 @@ export const GraphiQL = {
   }
 }; // Configure the UI by providing this Component as a child of GraphiQL.
 
-GraphiQL.Logo = function GraphiQLLogo(props) {
+GraphiQL.Logo = function GraphiQLLogo (props) {
   return <div className="title">
-      {props.children || <span>{'Graph'}<em>{'i'}</em>{'QL'}</span>}
-    </div>;
+    {props.children || <span>{'Graph'}<em>{'i'}</em>{'QL'}</span>}
+  </div>;
 }; // Configure the UI by providing this Component as a child of GraphiQL.
 
-
-GraphiQL.Toolbar = function GraphiQLToolbar(props) {
+GraphiQL.Toolbar = function GraphiQLToolbar (props) {
   return <div className="toolbar">
-      {props.children}
-    </div>;
+    {props.children}
+  </div>;
 }; // Export main windows/panes to be used separately if desired.
-
 
 GraphiQL.QueryEditor = QueryEditor;
 GraphiQL.VariableEditor = VariableEditor;
@@ -745,10 +738,10 @@ GraphiQL.MenuItem = ToolbarMenuItem; // Add a select-option input to the Toolbar
 GraphiQL.Select = ToolbarSelect;
 GraphiQL.SelectOption = ToolbarSelectOption; // Configure the UI by providing this Component as a child of GraphiQL.
 
-GraphiQL.Footer = function GraphiQLFooter(props) {
+GraphiQL.Footer = function GraphiQLFooter (props) {
   return <div className="footer">
-      {props.children}
-    </div>;
+    {props.children}
+  </div>;
 };
 
 const defaultQuery = `# Welcome to GraphiQL
@@ -782,12 +775,11 @@ const defaultQuery = `# Welcome to GraphiQL
 
 `; // Duck-type promise detection.
 
-function isPromise(value) {
+function isPromise (value) {
   return typeof value === 'object' && typeof value.then === 'function';
 } // Duck-type Observable.take(1).toPromise()
 
-
-function observableToPromise(observable) {
+function observableToPromise (observable) {
   if (!isObservable(observable)) {
     return observable;
   }
@@ -802,7 +794,6 @@ function observableToPromise(observable) {
   });
 } // Duck-type observable detection.
 
-
-function isObservable(value) {
+function isObservable (value) {
   return typeof value === 'object' && typeof value.subscribe === 'function';
 }

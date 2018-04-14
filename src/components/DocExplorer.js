@@ -42,14 +42,14 @@ export const DocExplorer = {
     if (schema === undefined) {
       // Schema is undefined when it is being loaded via introspection.
       content = <div class="spinner-container">
-          <div class="spinner" />
-        </div>;
+        <div class="spinner" />
+      </div>;
     } else if (!schema) {
       // Schema is null when it explicitly does not exist, typically due to
       // an error during introspection.
       content = <div class="error-container">
-          {'No Schema Available'}
-        </div>;
+        {'No Schema Available'}
+      </div>;
     } else if (navItem.search) {
       content = <SearchResults searchValue={navItem.search} withinType={navItem.def} schema={schema} onClickType={this.handleClickTypeOrField} onClickField={this.handleClickTypeOrField} />;
     } else if (navStack.length === 1) {
@@ -68,22 +68,22 @@ export const DocExplorer = {
     }
 
     return <div class="doc-explorer" key={navItem.name}>
-        <div class="doc-explorer-title-bar">
-          {prevName && <div class="doc-explorer-back" onClick={this.handleNavBackClick}>
-              {prevName}
-            </div>}
-          <div class="doc-explorer-title">
-            {navItem.title || navItem.name}
-          </div>
-          <div class="doc-explorer-rhs">
-            {this.$children}
-          </div>
+      <div class="doc-explorer-title-bar">
+        {prevName && <div class="doc-explorer-back" onClick={this.handleNavBackClick}>
+          {prevName}
+        </div>}
+        <div class="doc-explorer-title">
+          {navItem.title || navItem.name}
         </div>
-        <div class="doc-explorer-contents">
-          {shouldSearchBoxAppear && <SearchBox value={navItem.search} placeholder={`Search ${navItem.name}...`} onSearch={this.handleSearch} />}
-          {content}
+        <div class="doc-explorer-rhs">
+          {this.$children}
         </div>
-      </div>;
+      </div>
+      <div class="doc-explorer-contents">
+        {shouldSearchBoxAppear && <SearchBox value={navItem.search} placeholder={`Search ${navItem.name}...`} onSearch={this.handleSearch} />}
+        {content}
+      </div>
+    </div>;
   },
 
   methods: {
@@ -118,7 +118,8 @@ export const DocExplorer = {
     showSearch(search) {
       const navStack = this.$data.navStack.slice();
       const topNav = navStack[navStack.length - 1];
-      navStack[navStack.length - 1] = { ...topNav,
+      navStack[navStack.length - 1] = {
+        ...topNav,
         search
       };
       this.navStack = navStack;
